@@ -1,5 +1,6 @@
 window.totalCanvasWidth = 500;
 window.totalCanvasHeight = 260;
+window.mouseRadGrowth = 10;
 
 window.onload = function(){
 
@@ -42,7 +43,10 @@ window.onload = function(){
                 }
               });
               if (!inShift) {
-                actualSprite.frameIndex -= 1;
+                actualSprite.frameIndex -= 3;
+                if (actualSprite.frameIndex < 0){
+                  actualSprite.frameIndex = 0;
+                }
               }
             }
           }
@@ -112,12 +116,12 @@ window.onload = function(){
   }
 
   function gameLoop () {
-    if (window.activeMouseShift) {
-      window.activeMouseShift.rad += 5;
+    if (window.activeMouseShift && window.activeMouseShift.rad < window.totalCanvasWidth) {
+      window.activeMouseShift.rad += window.mouseRadGrowth;
     }
     window.mouseShifts.forEach(function(mouseShift){
       if (!mouseShift.active){
-        mouseShift.rad -= 5;
+        mouseShift.rad -= window.mouseRadGrowth;
         if (mouseShift.rad === 0){
           window.mouseShifts.splice(window.mouseShifts.indexOf(mouseShift), 1);
         }
@@ -132,7 +136,9 @@ window.onload = function(){
 
   function loadCheck() {
     window.numLoaded++;
+    document.getElementById('load-num').textContent = 'Loading... ' + (window.numLoaded/window.numToLoad)*100 + '%';
     if(window.numLoaded == window.numToLoad){
+      document.getElementById('load-num').textContent = 'Click and hold to transform!';
       gameLoop();
     }
   };
@@ -166,7 +172,7 @@ window.onload = function(){
       window.canvasContext = canvas.getContext("2d");
       window.canvas = canvas;
       window.canvas.addEventListener("mousedown", mouseDown, false);
-      window.canvas.addEventListener("mouseup", mouseUp, false);
+      window.addEventListener("mouseup", mouseUp, false);
       window.mouseRad = 0;
       window.mouseShifts = [];
 
@@ -212,7 +218,7 @@ window.onload = function(){
     var mouseShift = {
       mx: x,
       my: y,
-      rad: 5,
+      rad: window.mouseRadGrowth,
       active: true
     };
     window.mouseShifts.push(mouseShift);
